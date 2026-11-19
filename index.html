@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Твой киновайб · Киноклуб на Типографской</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lobster&family=Oswald:wght@500;700&family=PT+Serif:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f1eee7; --ink:#151311; --ink2:#3b3631; --muted:#7d766b; --line:#d4cdbf;
+  --gold:#c9a046; --gold2:#e6c45e; --red:#b8322a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--paper); color:var(--ink); min-height:100vh;
+  font-family:"PT Serif",Georgia,serif; font-size:17px; line-height:1.5;
+  display:flex; flex-direction:column; overflow-x:hidden;
+}
+body::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:60; opacity:.3; mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .4 0 0 0 0 .37 0 0 0 0 .32 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.mono{font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+.poster{font-family:Oswald,Impact,sans-serif; font-weight:700; text-transform:uppercase; line-height:.95}
+
+header{display:flex; justify-content:space-between; gap:16px; padding:18px 24px; border-bottom:1px solid var(--line)}
+main{flex:1; display:flex; justify-content:center; padding:26px 20px 44px}
+footer{padding:16px 24px 22px; border-top:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px}
+.screen{display:none; width:100%; max-width:720px}
+.screen.on{display:block; animation:in .45s ease}
+@keyframes in{from{opacity:0; transform:translateY(10px)}to{opacity:1; transform:none}}
+
+/* stickers */
+.sticker{filter:drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff) drop-shadow(2px 4px 4px rgba(0,0,0,.22))}
+
+/* intro */
+.hero{position:relative}
+.eye{width:100%; max-width:430px; display:block; margin:0 auto}
+.hero .st1{position:absolute; width:76px; left:2%; top:4%; transform:rotate(-14deg)}
+.hero .st2{position:absolute; width:62px; right:4%; top:52%; transform:rotate(12deg)}
+.intro h1{font-size:clamp(54px,11vw,104px); margin:18px 0 18px}
+.intro h1 span{font-family:Lobster,cursive; text-transform:none; font-weight:400; color:var(--red); display:inline-block; transform:rotate(-4deg); font-size:1.02em}
+.lead{max-width:560px; color:var(--ink2); margin-bottom:12px}
+.dates{margin:22px 0 6px; display:grid; grid-template-columns:1fr 1fr 1fr; border:2px solid var(--ink)}
+.dates div{padding:12px 14px; border-right:2px solid var(--ink)}
+.dates div:last-child{border-right:0; background:var(--ink); color:var(--paper)}
+.dates div:last-child .mono{color:var(--gold2)}
+.dates b{display:block; font-family:Oswald,sans-serif; font-size:24px; line-height:1.1; margin:2px 0}
+.dates small{font-size:14px; line-height:1.35; display:block}
+.how{margin:22px 0 26px}
+.how div{display:flex; gap:16px; padding:11px 0; border-bottom:1px solid var(--line); font-size:16px}
+.how b{font-family:Oswald,sans-serif; font-size:19px; color:var(--red); min-width:22px; line-height:1.25}
+.go{display:flex; align-items:center; gap:4px}
+.hand{width:150px; flex:none}
+.hand.left{transform:scaleX(-1)}
+
+.btn{
+  font-family:Oswald,sans-serif; font-weight:500; font-size:18px; letter-spacing:.04em; text-transform:uppercase; text-decoration:none;
+  display:inline-block; background:var(--ink); color:var(--paper); border:2px solid var(--ink); padding:12px 26px; cursor:pointer;
+  transition:transform .12s, box-shadow .12s;
+}
+.btn:hover{transform:translate(-2px,-2px); box-shadow:4px 4px 0 var(--gold)}
+.btn.ghost{background:transparent; color:var(--ink)}
+.btn.gold{background:var(--gold); border-color:var(--ink); color:var(--ink)}
+.btn.done{background:var(--paper); color:var(--ink); pointer-events:none}
+
+/* film strip */
+.strip{background:#0d0c0b; padding:12px 10px; display:flex; gap:8px; position:relative; margin-bottom:26px}
+.strip::before,.strip::after{content:""; position:absolute; left:8px; right:8px; height:5px; background:repeating-linear-gradient(90deg,#f1eee7 0 7px,transparent 7px 16px); opacity:.85}
+.strip::before{top:3px}.strip::after{bottom:3px}
+.frm{flex:1; height:46px; background:#262320; border-radius:3px; display:flex; align-items:center; justify-content:center;
+  font-family:"IBM Plex Mono",monospace; font-size:12px; color:#5d574f; transition:background .4s, color .4s}
+.frm.done{background:linear-gradient(160deg,#d8d1c3,#8f887b); color:#151311}
+.frm.cur{box-shadow:inset 0 0 0 2px var(--gold); color:var(--gold2)}
+
+.q-meta{display:flex; justify-content:space-between; margin-bottom:10px}
+.q-head{display:flex; align-items:flex-start; gap:10px}
+.q-title{font-size:clamp(36px,6.5vw,58px); margin-bottom:8px; flex:1}
+.q-sub{color:var(--ink2); margin-bottom:22px; font-style:italic}
+.opts{display:grid; gap:10px}
+.opt{
+  display:flex; gap:14px; align-items:baseline; width:100%; text-align:left;
+  font:inherit; color:var(--ink); background:rgba(255,255,255,.5); border:2px solid var(--ink);
+  padding:14px 16px; cursor:pointer; transition:transform .12s, box-shadow .12s;
+}
+.opt:hover{transform:translate(-2px,-2px); box-shadow:4px 4px 0 var(--ink)}
+.opt .k{font-family:"IBM Plex Mono",monospace; font-size:12px; border:1px solid var(--ink); padding:0 6px}
+.opt.picked{background:var(--ink); color:var(--paper); box-shadow:4px 4px 0 var(--gold)}
+.opt.picked .k{border-color:var(--gold); color:var(--gold2)}
+.opts.locked .opt:not(.picked){opacity:.3}
+.opt.picked .k::after{content:" ✓"}
+.q-foot{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:18px; flex-wrap:wrap}
+.q-hint{font-size:15px; color:var(--ink2); font-style:italic}
+.q-hint.warn{color:var(--red)}
+.btn[disabled]{opacity:.3; pointer-events:none}
+
+/* toast */
+.toast{
+  position:fixed; left:50%; bottom:22px; z-index:50; transform:translate(-50%,40px); opacity:0; visibility:hidden;
+  background:#fff; border:2px solid var(--ink); box-shadow:4px 4px 0 var(--gold);
+  padding:10px 16px 10px 10px; display:flex; gap:12px; align-items:center; max-width:calc(100% - 40px);
+  transition:transform .4s cubic-bezier(.2,.8,.2,1), opacity .3s;
+}
+.toast.show{transform:translate(-50%,0); opacity:1; visibility:visible}
+.toast svg{width:46px; height:46px; flex:none}
+.toast b{font-family:Oswald,sans-serif; font-weight:500; text-transform:uppercase; font-size:17px; display:block}
+.toast small{color:var(--ink2); font-size:14px}
+
+/* THE END card */
+.end{
+  position:relative; aspect-ratio:4/3; max-height:70vh; margin:0 auto; border-radius:14px; overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,.28) 0 30%, rgba(255,255,255,.08) 31%, transparent 60%),
+    repeating-linear-gradient(90deg,#1a1918 0 14px,#2e2c2a 22px,#1f1e1c 34px,#3a3734 44px,#1a1918 56px);
+  display:flex; align-items:center; justify-content:center; animation:flick .12s steps(2) infinite;
+}
+@keyframes flick{50%{filter:brightness(1.06)}}
+.end .t{font-family:Lobster,cursive; color:#efede8; font-size:clamp(72px,16vw,140px); transform:rotate(-9deg);
+  text-shadow:3px 4px 0 #555, 6px 9px 14px rgba(0,0,0,.6)}
+.end .scr{position:absolute; inset:0; pointer-events:none}
+.end-cap{text-align:center; margin-top:14px}
+
+/* result */
+.res{border:2px solid var(--ink); background:#fff; padding:6px; box-shadow:8px 8px 0 var(--ink); animation:stampIn .6s cubic-bezier(.2,1.4,.4,1)}
+@keyframes stampIn{from{transform:scale(1.06) rotate(-1deg); opacity:0}to{transform:none; opacity:1}}
+.res-in{border:1px solid var(--ink); padding:22px 22px 20px; position:relative; overflow:hidden}
+.res-top{display:flex; justify-content:space-between; gap:12px}
+.vibe{font-size:clamp(46px,10vw,92px); margin:16px 0 6px; position:relative; z-index:1}
+.vibe .l1{color:var(--ink)}
+.vibe .l2{font-family:Lobster,cursive; text-transform:none; font-weight:400; color:var(--red); display:inline-block; transform:rotate(-4deg); margin-top:4px}
+.formula{font-style:italic; color:var(--ink2); margin:10px 0 16px; max-width:500px; position:relative; z-index:1}
+.stamps{display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px; position:relative; z-index:1}
+.stamp{font-family:"IBM Plex Mono",monospace; font-size:13px; text-transform:uppercase; letter-spacing:.06em; border:2px solid var(--ink); padding:4px 10px; transform:rotate(var(--r,0deg)); background:var(--paper)}
+.code{display:flex; align-items:baseline; gap:14px; border-top:2px solid var(--ink); padding-top:12px; position:relative; z-index:1}
+.code .poster{font-size:34px; letter-spacing:.06em}
+.res-eye{position:absolute; right:-50px; top:40px; width:280px; opacity:.1; pointer-events:none}
+
+.send{margin-top:28px; border:2px solid var(--ink); padding:18px; background:#fff; display:flex; gap:12px; align-items:center; flex-wrap:wrap}
+.send .txt{flex:1; min-width:230px}
+.send b{font-family:Oswald,sans-serif; font-weight:500; text-transform:uppercase; font-size:20px; display:block}
+.send p{font-size:15.5px; color:var(--ink2)}
+.note{font-size:15px; color:var(--red); margin-top:10px; min-height:22px}
+.actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px}
+
+.shelf{margin-top:30px}
+.shelf h3{margin-bottom:12px}
+.stickers{display:grid; grid-template-columns:repeat(6,1fr); gap:10px}
+.stk{text-align:center; font-size:13px; line-height:1.25}
+.stk svg{width:100%; max-width:70px; aspect-ratio:1; display:block; margin:0 auto 6px}
+.stk.off svg{filter:grayscale(1) opacity(.22)}
+.stk.off{color:var(--muted)}
+
+.patch{width:150px}
+
+@media (max-width:600px){
+  header,footer{padding-left:16px; padding-right:16px}
+  .dates{grid-template-columns:1fr}
+  .dates div{border-right:0; border-bottom:2px solid var(--ink)}
+  .dates div:last-child{border-bottom:0}
+  .hand{width:100px}
+  .stickers{grid-template-columns:repeat(3,1fr)}
+  .strip{gap:5px}
+  .frm{height:36px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="mono">Киноклуб на Типографской</span>
+  <span class="mono">Фильм на 25 ноября</span>
+</header>
+
+<main>
+  <!-- INTRO -->
+  <section class="screen intro on" id="s-intro">
+    <div class="hero">
+      <svg class="eye" id="eye-intro" viewBox="0 0 400 210" aria-hidden="true"></svg>
+      <svg class="sticker st1" data-st="star" viewBox="0 0 100 100" aria-hidden="true"></svg>
+      <svg class="sticker st2" data-st="key" viewBox="0 0 100 100" aria-hidden="true"></svg>
+    </div>
+    <h1 class="poster">Твой <span>киновайб</span></h1>
+    <p class="lead">Мы выбираем фильм на среду, 25 ноября, и хотим, чтобы его выбрали вы. Шесть вопросов о том, каким должен быть этот вечер.</p>
+
+    <div class="dates">
+      <div><span class="mono">19 ноября</span><b>Голосуем</b><small>Проходи тест и отправляй ответы</small></div>
+      <div><span class="mono">20 ноября</span><b>Выбираем</b><small>Считаем голоса и предлагаем несколько фильмов</small></div>
+      <div><span class="mono">25 ноября · 18:30</span><b>Смотрим</b><small>Типографская, 6, вход свободный</small></div>
+    </div>
+
+    <div class="how">
+      <div><b>1</b>Шесть вопросов, шесть кадров плёнки. В каждом можно отметить несколько вариантов, но не все сразу. Первый отмеченный считаем главным.</div>
+      <div><b>2</b>За некоторые ответы дают наклейки. Какие, узнаешь по ходу.</div>
+      <div><b>3</b>В конце нажми «Отправить голос». Без этого ответы не засчитаются.</div>
+    </div>
+    <div class="go">
+      <svg class="hand" viewBox="0 0 230 100" data-hand aria-hidden="true"></svg>
+      <button class="btn" id="start">Начать</button>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="screen" id="s-quiz">
+    <div class="strip" id="strip"></div>
+    <div class="q-meta"><span class="mono" id="q-num"></span><span class="mono" id="q-tag" style="color:var(--red)"></span></div>
+    <div class="q-title poster" id="q-title"></div>
+    <div class="q-sub" id="q-sub"></div>
+    <div class="opts" id="opts"></div>
+    <div class="q-foot">
+      <span class="q-hint" id="q-hint">Можно отметить несколько</span>
+      <button class="btn" id="next" disabled>Дальше</button>
+    </div>
+  </section>
+
+  <!-- THE END -->
+  <section class="screen" id="s-end">
+    <div class="end">
+      <svg class="scr" id="scratches" viewBox="0 0 400 300" preserveAspectRatio="none" aria-hidden="true"></svg>
+      <div class="t">Конец</div>
+    </div>
+    <div class="end-cap mono">Склеиваем плёнку</div>
+  </section>
+
+  <!-- RESULT -->
+  <section class="screen" id="s-result">
+    <div class="res"><div class="res-in">
+      <svg class="res-eye" id="eye-res" viewBox="0 0 400 210" aria-hidden="true"></svg>
+      <div class="res-top"><span class="mono">Твой киновайб</span><span class="mono" id="r-no"></span></div>
+      <div class="vibe poster"><div class="l1" id="r-l1"></div><div class="l2" id="r-l2"></div></div>
+      <p class="formula" id="r-formula"></p>
+      <div class="stamps" id="r-stamps"></div>
+      <div class="code"><span class="mono">Код</span><span class="poster" id="r-code"></span></div>
+    </div></div>
+
+    <div class="send">
+      <svg class="hand" viewBox="0 0 230 100" data-hand aria-hidden="true" style="width:110px"></svg>
+      <div class="txt">
+        <b>Отправь голос</b>
+        <p>20 ноября посчитаем ответы всех, кто прошёл тест, и предложим фильмы на 25-е.</p>
+      </div>
+      <a class="btn gold" id="send" target="_blank" rel="noopener">Отправить голос</a>
+    </div>
+    <div class="note" id="note"></div>
+
+    <div class="actions">
+      <button class="btn ghost" id="copy">Скопировать вайб</button>
+      <button class="btn ghost" id="again">Пройти заново</button>
+    </div>
+
+    <div class="shelf">
+      <h3 class="mono" id="shelf-title">Наклейки</h3>
+      <div class="stickers" id="stickers"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span class="mono">Типографская, 6 · 18:30 · вход свободный</span>
+  <svg class="patch" viewBox="0 0 220 120" aria-label="Кино и кофе" id="patch"></svg>
+</footer>
+
+<div class="toast" id="toast"><svg viewBox="0 0 100 100" id="t-ico"></svg><div><b id="t-title"></b><small id="t-sub"></small></div></div>
+
+<script>
+/* ===== Google Form (ответы уходят в таблицу) =====
+   base: ссылка вида https://docs.google.com/forms/d/e/XXXX/formResponse
+   entries: номера полей entry.NNN из предзаполненной ссылки */
+const FORM = {
+  base: "https://docs.google.com/forms/d/e/1FAIpQLSeuDZZkAHFxGcSRjVmhWC4I5k2rdwz9Tr9ciOjEt35YmKoTew/formResponse",
+  entries: {mood:"1059280880", tempo:"1469483110", genre:"2129855571", psych:"1460508923", eros:"214695573", era:"2022032324", code:"128492608"}
+};
+
+/* ===== вопросы ===== */
+const Q = [
+  {key:"mood", tag:"настроение", title:"С чем выходим из зала?", sub:"Первое, что почувствуешь, когда включат свет.",
+   a:["Посмеяться и выдохнуть","Понервничать до самых титров","Задуматься и молчать до самого дома"],
+   short:["Посмеяться","Понервничать","Задуматься"]},
+  {key:"tempo", tag:"темп", title:"Какой ритм?", sub:"Сколько тишины ты готов вытерпеть.",
+   a:["Без пауз, сразу к делу","В меру, как в хорошем романе","Неспешно, с длинными планами и тишиной"],
+   short:["Динамично","В меру","Неспешно"]},
+  {key:"genre", tag:"жанр", title:"Куда тянет?", sub:"Выбирай сердцем, не головой.",
+   a:["Драма","Романтика","Триллер или детектив","Хоррор","Что-то странное, у чего жанра нет"],
+   short:["Драма","Романтика","Триллер/детектив","Хоррор","Странное"]},
+  {key:"psych", tag:"психологизм", title:"Как глубоко лезем в голову?", sub:"Героям, разумеется. Не тебе.",
+   a:["До самого дна, пусть будет неуютно","Пусть характер виден по поступкам","Без психоанализа, хочется лёгких людей"],
+   short:["Глубоко","Через поступки","Легко"]},
+  {key:"eros", tag:"эротизм", title:"Сколько телесного?", sub:"Зал маленький, все друг друга видят.",
+   a:["Целомудренно, мы тут ради сюжета","Напряжение есть, но всё за кадром","Откровенно, мы взрослые люди"],
+   short:["Целомудренно","За кадром","Откровенно"]},
+  {key:"era", tag:"эпоха", title:"Старое или новое?", sub:"Плёнка или цифра, если совсем просто.",
+   a:["Классика, которую все видели, кроме меня","Где-то между 70-ми и нулевыми","Свежее, последних лет десяти"],
+   short:["Классика","70-е–00-е","Новое"]}
+];
+const MOOD_ADJ = ["Смешная","Нервная","Тихая"];
+const ERA_ADJ  = ["старая","плёночная","новая"];
+const GENRE_N  = ["драма","романтика","интрига","жуть","странность"];
+const MOOD_PH  = ["посмеяться","понервничать","подумать"];
+const ERA_PH   = ["постарше, из классики","с зерном плёнки, из 70-х–нулевых","свежим, недавним"];
+const STAMPS = {tempo:["без пауз","в меру","медленно"], psych:["до дна","по поступкам","без психоанализа"], eros:["целомудренно","за кадром","18+"]};
+
+const BADGES = {
+  night:{t:"Ночной сеанс", s:"Тебя не пугает темнота в зале", st:"moon"},
+  cinephile:{t:"Синефил со стажем", s:"Классика и длинные планы", st:"key"},
+  analyst:{t:"Сеанс психоанализа", s:"Подумать и залезть героям в голову", st:"eye"},
+  adult:{t:"Восемнадцать с плюсом", s:"Мы взрослые люди", st:"heart"},
+  razgrom:{t:"Проект «Разгром»", s:"Твой вкус не помещается в жанр", st:"star"},
+  romcom:{t:"Ромком без стыда", s:"Посмеяться и влюбиться за один вечер", st:"sun"}
+};
+function earned(p){
+  const has = (k, v) => (p[k] || []).includes(v), g = [];
+  if (has("genre",3)) g.push("night");
+  if (has("genre",4)) g.push("razgrom");
+  if (has("eros",2)) g.push("adult");
+  if (has("mood",0) && has("genre",1)) g.push("romcom");
+  if (has("mood",2) && has("psych",0)) g.push("analyst");
+  if (has("era",0) && has("tempo",2)) g.push("cinephile");
+  return g;
+}
+
+/* ===== иллюстрации ===== */
+function rng(seed){ let s = seed; return () => (s = (s*16807) % 2147483647) / 2147483647; }
+
+function drawEye(svg, seed){
+  const r = rng(seed), id = svg.id;
+  let o = `<defs><clipPath id="${id}-c"><path d="M20,105 Q200,-15 380,105 Q200,225 20,105 Z"/></clipPath></defs><g clip-path="url(#${id}-c)" stroke="#151311" stroke-width=".7">`;
+  for (let x = -200; x < 420; x += 6) o += `<line x1="${x}" y1="0" x2="${x+180}" y2="210" opacity=".45"/>`;
+  for (let i = 0; i < 520; i++){ const x = 20+r()*360, y = 20+r()*170, d = Math.hypot(x-200,(y-105)*1.8);
+    if (d > 110 && r() < (d-110)/90) o += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(0.6+r()*1.1).toFixed(2)}" fill="#151311" stroke="none"/>`; }
+  o += `</g><circle cx="200" cy="105" r="62" fill="#f1eee7" stroke="#151311" stroke-width="2.4"/><g stroke="#151311">`;
+  for (let i = 0; i < 150; i++){ const a = i/150*Math.PI*2, r1 = 24+r()*6, r2 = 52+r()*9;
+    o += `<line x1="${(200+Math.cos(a)*r1).toFixed(1)}" y1="${(105+Math.sin(a)*r1).toFixed(1)}" x2="${(200+Math.cos(a)*r2).toFixed(1)}" y2="${(105+Math.sin(a)*r2).toFixed(1)}" stroke-width="${(0.5+r()*0.9).toFixed(2)}"/>`; }
+  o += `</g><circle cx="200" cy="105" r="62" fill="none" stroke="#c9a046" stroke-width="1.4" stroke-dasharray="2 3"/><circle cx="200" cy="105" r="25" fill="#151311"/><circle cx="214" cy="92" r="7" fill="#f1eee7"/>`;
+  o += `<path d="M20,105 Q200,-15 380,105 Q200,225 20,105 Z" fill="none" stroke="#151311" stroke-width="3"/>`;
+  for (let i = 1; i < 22; i++){ const t = i/22, x = (1-t)*(1-t)*20+2*(1-t)*t*200+t*t*380, y = (1-t)*(1-t)*105+2*(1-t)*t*(-15)+t*t*105, dx = (t-.5)*1.6, L = 14+Math.sin(t*Math.PI)*16;
+    o += `<path d="M${x.toFixed(1)},${y.toFixed(1)} q${(dx*L*.4).toFixed(1)},${(-L*.6).toFixed(1)} ${(dx*L).toFixed(1)},${(-L).toFixed(1)}" stroke="#151311" stroke-width="2" fill="none" stroke-linecap="round"/>`; }
+  svg.innerHTML = o;
+}
+
+/* гравюрная рука-указатель (смотрит вправо) */
+function drawHand(svg, uid){
+  const hand = "M212,32 C224,32 225,46 212,47 L120,50 C122,54 122,60 114,61 C126,62 124,73 112,73 C123,75 120,86 108,86 C116,89 112,97 100,96 L70,95 L54,93 L54,10 L70,12 C80,10 92,14 100,20 C106,25 112,28 120,29 Z";
+  let o = `<defs>
+    <pattern id="h-${uid}" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(-8)"><line x1="0" y1="0" x2="4" y2="0" stroke="#151311" stroke-width=".9"/></pattern>
+    <pattern id="c-${uid}" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(80)"><line x1="0" y1="0" x2="5" y2="0" stroke="#151311" stroke-width=".6"/></pattern>
+    <clipPath id="k-${uid}"><path d="${hand}"/></clipPath></defs>`;
+  o += `<path d="${hand}" fill="#fbf9f4"/>`;
+  o += `<g clip-path="url(#k-${uid})"><rect x="54" y="52" width="80" height="50" fill="url(#h-${uid})"/><rect x="100" y="40" width="120" height="12" fill="url(#h-${uid})" opacity=".8"/><rect x="54" y="10" width="40" height="45" fill="url(#h-${uid})" opacity=".55"/></g>`;
+  o += `<path d="${hand}" fill="none" stroke="#151311" stroke-width="2" stroke-linejoin="round"/>`;
+  // ноготь, суставы, большой палец
+  o += `<path d="M216,34 C221,37 221,43 216,45" fill="none" stroke="#151311" stroke-width="1.3"/>
+        <path d="M150,31 l0,17 M176,32 l0,15" stroke="#151311" stroke-width="1" opacity=".6"/>
+        <path d="M100,34 C112,32 130,33 142,38 C134,42 116,42 102,41" fill="#fbf9f4" stroke="#151311" stroke-width="1.6"/>
+        <path d="M108,62 l-10,1 M104,74 l-10,1 M100,87 l-8,1" stroke="#151311" stroke-width="1.2"/>`;
+  // манжета с рюшей
+  o += `<rect x="18" y="6" width="36" height="92" fill="url(#c-${uid})" stroke="#151311" stroke-width="2"/>
+        <path d="M54,6 q-8,8 0,15 q-8,8 0,15 q-8,8 0,15 q-8,8 0,15 q-8,8 0,15 q-8,8 0,17" fill="#fbf9f4" stroke="#151311" stroke-width="1.6"/>
+        <path d="M18,6 l0,92" stroke="#151311" stroke-width="3"/>`;
+  svg.innerHTML = o;
+}
+
+/* наклейки-коллаж */
+const ST = {
+  star:(tear) => `<path d="M50,4 L62,36 L96,37 L69,58 L79,92 L50,72 L21,92 L31,58 L4,37 L38,36 Z" fill="#e6c45e" stroke="#2a2210" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M38,36 L50,4 M62,36 L96,37 M69,58 L79,92" stroke="#a9812e" stroke-width="1" opacity=".6"/>
+    <path d="M38,48 q5,-4 10,0 M54,48 q5,-4 10,0" fill="none" stroke="#2a2210" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="36" cy="58" r="5" fill="#e9887a" opacity=".7"/><circle cx="66" cy="58" r="5" fill="#e9887a" opacity=".7"/>
+    <ellipse cx="51" cy="63" rx="4" ry="3" fill="#b8322a"/>
+    ${tear ? '<path d="M40,52 q-3,6 0,9 q3,-3 0,-9" fill="#8fc3d9" stroke="#2a2210" stroke-width=".8"/>' : ''}`,
+  key:() => `<g transform="rotate(-35 50 50)"><circle cx="50" cy="20" r="14" fill="none" stroke="#c9a046" stroke-width="7"/><circle cx="50" cy="20" r="14" fill="none" stroke="#5c4413" stroke-width="1"/>
+    <circle cx="50" cy="20" r="5" fill="#e6c45e" stroke="#5c4413"/><rect x="46" y="34" width="8" height="54" fill="#c9a046" stroke="#5c4413"/>
+    <rect x="54" y="70" width="12" height="6" fill="#c9a046" stroke="#5c4413"/><rect x="54" y="80" width="9" height="6" fill="#c9a046" stroke="#5c4413"/>
+    <rect x="43" y="38" width="14" height="4" fill="#e6c45e" stroke="#5c4413"/></g>`,
+  moon:() => `<path d="M64,8 A42,42 0 1 0 64,92 A34,34 0 1 1 64,8 Z" fill="#e6c45e" stroke="#2a2210" stroke-width="2.5"/>
+    <path d="M28,46 q5,4 10,0" fill="none" stroke="#2a2210" stroke-width="2" stroke-linecap="round"/><circle cx="30" cy="58" r="5" fill="#e9887a" opacity=".7"/>
+    <path d="M26,70 q6,4 12,0" fill="none" stroke="#b8322a" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="80" cy="22" r="2" fill="#2a2210"/><circle cx="88" cy="44" r="1.5" fill="#2a2210"/>`,
+  eye:() => `<path d="M6,50 Q50,8 94,50 Q50,92 6,50 Z" fill="#f4e7da" stroke="#2a2210" stroke-width="2.5"/>
+    <circle cx="50" cy="50" r="20" fill="#6f8f3c" stroke="#2a2210" stroke-width="2"/><circle cx="50" cy="50" r="9" fill="#151311"/><circle cx="55" cy="45" r="3.5" fill="#fff"/>
+    <path d="M6,50 Q50,8 94,50" fill="none" stroke="#2a2210" stroke-width="4"/>
+    <path d="M20,38 l-4,-8 M34,29 l-2,-9 M50,26 l0,-9 M66,29 l2,-9 M80,38 l4,-8" stroke="#2a2210" stroke-width="2" stroke-linecap="round"/>
+    <path d="M18,58 Q50,80 82,58" fill="none" stroke="#c98a7d" stroke-width="2" opacity=".7"/>`,
+  heart:() => `<path d="M50,90 C20,70 6,50 8,32 C10,14 32,6 50,24 C68,6 90,14 92,32 C94,50 80,70 50,90 Z" fill="#c9a046" stroke="#5c4413" stroke-width="2.5"/>
+    <path d="M24,26 C30,18 40,20 44,28" fill="none" stroke="#f6e3a0" stroke-width="5" stroke-linecap="round" opacity=".8"/>
+    <path d="M30,50 C40,56 46,66 50,80 M70,48 C62,56 56,66 52,80 M50,36 L50,70" stroke="#7a5a1a" stroke-width="1.4" fill="none" opacity=".7"/>`,
+  sun:() => { let rays = ""; for (let i = 0; i < 12; i++){ const a = i*30; rays += `<path d="M50,50 L46,8 Q50,0 54,8 Z" transform="rotate(${a} 50 50)" fill="#e6c45e" stroke="#5c4413" stroke-width="1.5"/>`; }
+    return rays + `<circle cx="50" cy="50" r="24" fill="#c9a046" stroke="#5c4413" stroke-width="2"/>
+    <path d="M40,46 q4,-4 8,0 M54,46 q4,-4 8,0" fill="none" stroke="#2a2210" stroke-width="2" stroke-linecap="round"/>
+    <path d="M42,57 q8,7 16,0" fill="none" stroke="#2a2210" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="38" cy="54" r="3.5" fill="#e9887a" opacity=".7"/><circle cx="64" cy="54" r="3.5" fill="#e9887a" opacity=".7"/>`; }
+};
+function sticker(name){ return name === "star" ? ST.star(true) : ST[name](); }
+
+/* нашивка «Кино и кофе» */
+function drawPatch(svg){
+  svg.innerHTML = `<path d="M18,20 L170,20 C170,78 140,108 96,108 C52,108 18,78 18,20 Z" fill="#1d2433" stroke="#c9a046" stroke-width="3"/>
+    <path d="M26,27 L162,27 C160,74 134,100 96,100 C58,100 30,74 26,27 Z" fill="none" stroke="#c9a046" stroke-width="1.3" stroke-dasharray="4 3"/>
+    <path d="M168,38 C196,36 200,72 160,74" fill="none" stroke="#1d2433" stroke-width="12"/><path d="M168,38 C196,36 200,72 160,74" fill="none" stroke="#c9a046" stroke-width="2.5"/>
+    <ellipse cx="94" cy="27" rx="60" ry="5" fill="#c9a046" opacity=".55"/>
+    <text x="96" y="60" text-anchor="middle" font-family="Oswald,sans-serif" font-size="22" font-weight="700" fill="#e6c45e" letter-spacing="1">КИНО</text>
+    <text x="96" y="84" text-anchor="middle" font-family="Lobster,cursive" font-size="20" fill="#e6c45e">и кофе</text>`;
+}
+
+/* царапины для «Конца» */
+function drawScratches(){
+  const r = rng(Math.floor(Math.random()*1e6)+1); let o = "";
+  for (let i = 0; i < 9; i++){ const x = r()*400; o += `<line x1="${x}" y1="0" x2="${x+(r()-.5)*8}" y2="300" stroke="#fff" stroke-width="${(r()*1.2).toFixed(2)}" opacity="${(0.1+r()*0.25).toFixed(2)}"/>`; }
+  for (let i = 0; i < 40; i++) o += `<circle cx="${(r()*400).toFixed(0)}" cy="${(r()*300).toFixed(0)}" r="${(r()*1.6).toFixed(2)}" fill="#fff" opacity="${(0.2+r()*0.5).toFixed(2)}"/>`;
+  $('scratches').innerHTML = o;
+}
+
+/* ===== логика ===== */
+const $ = id => document.getElementById(id);
+let qi = 0, picks = {}, badges = new Set(), locked = false;
+
+function show(id){ document.querySelectorAll('.screen').forEach(s => s.classList.remove('on')); $(id).classList.add('on'); window.scrollTo({top:0, behavior:'smooth'}); }
+function shuffle(a){ for (let i = a.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; }
+
+function start(){
+  qi = 0; picks = {}; badges = new Set(); locked = false;
+  $('strip').innerHTML = Q.map((_,i) => `<div class="frm">${String(i+1).padStart(2,'0')}</div>`).join('');
+  show('s-quiz'); renderQ();
+}
+function renderQ(){
+  const q = Q[qi];
+  [...$('strip').children].forEach((f,i) => { f.classList.toggle('done', i < qi); f.classList.toggle('cur', i === qi); });
+  $('q-num').textContent = `Кадр ${qi+1} из ${Q.length}`;
+  $('q-tag').textContent = q.tag; $('q-title').textContent = q.title; $('q-sub').textContent = q.sub;
+  picks[q.key] = [];
+  const box = $('opts'); box.classList.remove('locked'); box.innerHTML = '';
+  shuffle(q.a.map((_,i) => i)).forEach((orig, n) => {
+    const b = document.createElement('button'); b.className = 'opt';
+    b.innerHTML = `<span class="k">${n+1}</span><span></span>`; b.lastChild.textContent = q.a[orig];
+    b.onclick = () => toggle(orig, b); box.appendChild(b);
+  });
+  $('next').textContent = qi === Q.length-1 ? 'Готово' : 'Дальше';
+  updateFoot();
+}
+function updateFoot(warn){
+  const q = Q[qi], n = picks[q.key].length, max = q.a.length - 1;
+  $('next').disabled = n === 0;
+  const h = $('q-hint');
+  h.classList.toggle('warn', !!warn);
+  h.textContent = warn ? 'Все сразу нельзя. Сними один, если хочешь другой.'
+    : n === 0 ? 'Можно отметить несколько' : n === 1 ? 'Можно добавить ещё' : `Отмечено ${n}, первый главный`;
+}
+function toggle(orig, el){
+  if (locked) return;
+  const arr = picks[Q[qi].key], i = arr.indexOf(orig);
+  if (i >= 0){ arr.splice(i,1); el.classList.remove('picked'); updateFoot(); return; }
+  if (arr.length >= Q[qi].a.length - 1){ updateFoot(true); return; }
+  arr.push(orig); el.classList.add('picked'); updateFoot();
+}
+function next(){
+  if (locked || !picks[Q[qi].key].length) return; locked = true;
+  $('opts').classList.add('locked');
+  $('strip').children[qi].classList.add('done');
+  earned(picks).forEach(k => { if (!badges.has(k)) { badges.add(k); toast(k); } });
+  setTimeout(() => { qi++; locked = false; if (qi < Q.length) renderQ(); else theEnd(); }, 450);
+}
+let tt;
+function toast(k){
+  const b = BADGES[k]; $('t-ico').innerHTML = sticker(b.st); $('t-ico').setAttribute('class','sticker');
+  $('t-title').textContent = 'Наклейка: ' + b.t; $('t-sub').textContent = b.s;
+  $('toast').classList.add('show'); clearTimeout(tt); tt = setTimeout(() => $('toast').classList.remove('show'), 2600);
+}
+function theEnd(){ drawScratches(); show('s-end'); setTimeout(result, 2300); }
+
+function formUrl(){
+  if (!FORM.base) return null;
+  const u = new URL(FORM.base);
+  Q.forEach(q => { if (FORM.entries[q.key]) u.searchParams.set('entry.' + FORM.entries[q.key], picks[q.key].map(i => q.short[i]).join(', ')); });
+  if (FORM.entries.code) u.searchParams.set('entry.' + FORM.entries.code, codeStr());
+  u.searchParams.set('submit', 'Submit');
+  return u.toString();
+}
+const codeStr = () => Q.map(q => picks[q.key].map(i => i + 1).join('+')).join('·');
+
+function result(){
+  const all = picks, p = {};
+  Object.keys(all).forEach(k => p[k] = all[k][0]);
+  $('r-l1').textContent = MOOD_ADJ[p.mood] + ' ' + ERA_ADJ[p.era];
+  $('r-l2').textContent = GENRE_N[p.genre];
+  const GENRE_ACC = ["драму","романтику","интригу","жуть","странность"];
+  const extraG = all.genre.slice(1).map(i => GENRE_ACC[i]);
+  const extraM = all.mood.slice(1).map(i => MOOD_PH[i]);
+  let f = `Тебе хочется ${MOOD_PH[p.mood]}${extraM.length ? ' (и немного ' + extraM.join(' и ') + ')' : ''}, а фильм пусть будет ${ERA_PH[p.era]}.`;
+  if (extraG.length) f += ` Если добавить сюда ${extraG.join(' и ')}, тоже не откажешься.`;
+  $('r-formula').textContent = f;
+  const st = (k) => all[k].map(i => STAMPS[k][i]).join(' / ');
+  $('r-stamps').innerHTML = '';
+  [['темп',st('tempo')],['голова',st('psych')],['тело',st('eros')]].forEach(([l,v],i) => {
+    const s = document.createElement('span'); s.className = 'stamp'; s.style.setProperty('--r', ['-2deg','1.5deg','-1deg'][i]); s.textContent = `${l}: ${v}`; $('r-stamps').appendChild(s);
+  });
+  $('r-code').textContent = codeStr();
+  $('r-no').textContent = '№ ' + (100 + Math.floor(Math.random()*900));
+  drawEye($('eye-res'), 3 + p.genre*11 + p.mood);
+
+  const send = $('send'), url = formUrl();
+  send.classList.remove('done'); send.textContent = 'Отправить голос'; $('note').textContent = '';
+  if (url) send.href = url; else send.removeAttribute('href');
+  let voted = false; try { voted = localStorage.getItem('kk-vote-25nov') === '1'; } catch(e){}
+  if (voted) $('note').textContent = 'С этого устройства голос уже отправляли. Если отправишь снова, засчитаем последний.';
+
+  $('shelf-title').textContent = `Наклейки · ${badges.size} из ${Object.keys(BADGES).length}`;
+  $('stickers').innerHTML = '';
+  Object.entries(BADGES).forEach(([k,b]) => {
+    const on = badges.has(k), d = document.createElement('div');
+    d.className = 'stk' + (on ? '' : ' off');
+    d.innerHTML = `<svg class="${on ? 'sticker' : ''}" viewBox="0 0 100 100">${sticker(b.st)}</svg><span></span>`;
+    d.lastChild.textContent = on ? b.t : '???'; d.title = on ? b.s : 'Попробуй ответить иначе';
+    $('stickers').appendChild(d);
+  });
+  window._share = `Мой киновайб: ${$('r-l1').textContent} ${$('r-l2').textContent}. Код ${codeStr()}`;
+  show('s-result');
+}
+
+$('send').addEventListener('click', e => {
+  if (!FORM.base){ e.preventDefault(); $('note').textContent = 'Голосование ещё не открыто. Загляни чуть позже.'; return; }
+  try { localStorage.setItem('kk-vote-25nov','1'); } catch(_){}
+  setTimeout(() => { $('send').classList.add('done'); $('send').textContent = 'Голос отправлен'; $('note').textContent = 'Спасибо! 20 ноября расскажем, что получилось.'; }, 300);
+});
+$('start').onclick = start;
+$('again').onclick = start;
+$('copy').onclick = async () => {
+  try { await navigator.clipboard.writeText(window._share); $('note').textContent = 'Скопировано'; } catch(e){ $('note').textContent = window._share; }
+};
+$('next').onclick = next;
+document.addEventListener('keydown', e => {
+  if (!$('s-quiz').classList.contains('on')) return;
+  if (e.key === 'Enter'){ e.preventDefault(); next(); return; }
+  const b = $('opts').children[parseInt(e.key,10)-1]; if (b) b.click();
+});
+
+drawEye($('eye-intro'), 7);
+document.querySelectorAll('[data-hand]').forEach((s,i) => drawHand(s, i));
+document.querySelectorAll('[data-st]').forEach(s => s.innerHTML = sticker(s.dataset.st));
+drawPatch($('patch'));
+</script>
+</body>
+</html>
